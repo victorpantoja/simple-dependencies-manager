@@ -7,13 +7,11 @@ import subprocess
 import yaml
 import os
 
-config = yaml.load(open("config.yaml", 'r'))
-WORKSPACE = config['workspace']
+config = None
+WORKSPACE = None
 
 def get_last_tag(repo):
     cmd = 'git describe --tags `git rev-list --tags --max-count=1`'
-    
-    import pdb; pdb.set_trace()
     p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+repo)
     p.wait()
 
@@ -34,8 +32,11 @@ def git_push(repo):
     p.wait()
 
 def main(argv):
+    global config
+    global WORKSPACE
+
     try:
-        opts, args = getopt.getopt(argv,"hu:c:pt",["update=","create=","push=","tags="])
+        opts, args = getopt.getopt(argv,"hy:u:c:p:t",["update=","create=","push=","tags=","yaml="])
     except getopt.GetoptError:
         print 'Usage: python simple-manager'
         sys.exit(2)
@@ -47,12 +48,16 @@ def main(argv):
         elif opt in ("-u", "--update"):
             git_update(arg)
         elif opt in ("-c", "--create"):
-            git_clone(BASE_HREF % arg)
+            git_clone(WORKSPACE % arg)
             #thread?
         elif opt in ("-p", "--push"):
             git_push(arg)
         elif opt in ("-t", "--tags"):
             get_last_tag(arg)
+        elif opt in ("-y", "--yaml"):
+            config = yaml.load(open(arg, 'r'))
+            WORKSPACE = config['workspace']
+            print WORKSPACE
             
 
 if __name__ == "__main__":

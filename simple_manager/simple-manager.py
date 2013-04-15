@@ -39,7 +39,7 @@ def main(argv):
     global project
 
     try:
-        opts, args = getopt.getopt(argv,"hy:r:ucpt",["update=","create=","push=","tags=","yaml="])
+        opts, args = getopt.getopt(argv,"hy:r:ucpTt:",["update=","create=","push=","tags=","yaml="])
     except getopt.GetoptError:
         print 'Usage: python simple-manager -y <yaml file> -c <project> -[cptu]'
         sys.exit(2)
@@ -57,6 +57,10 @@ def main(argv):
         elif opt in ("-r", "--repo"):
             project = arg
 
+            if not config['projects'].get(project):
+                print "Project '%s' is not configured in config.yaml. Please, verify." % project
+            sys.exit(2)
+
         elif opt in ("-u", "--update"):
             git_update()
 
@@ -67,8 +71,16 @@ def main(argv):
         elif opt in ("-p", "--push"):
             git_push()
 
-        elif opt in ("-t", "--tags"):
+        elif opt in ("-T", "--tags"):
             get_last_tag()
+            
+        elif opt in ("-t", "--tag"):
+            if project == 'all':
+                print "You must specify only one project to use -t option but you specified 'all'"
+                sys.exit(2)
+            else:
+                tag = arg
+                git_tag()
             
 
 if __name__ == "__main__":

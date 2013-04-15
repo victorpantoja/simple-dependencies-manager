@@ -20,3 +20,8 @@ You can update your projects:
 $ python simple-manager --update project_b --update project_c
 
 This way, you will pull both project from git.
+
+
+CHANGE LOG
+==========
+0.1.0: First version. Things like cloning, pushing and pulling implemented

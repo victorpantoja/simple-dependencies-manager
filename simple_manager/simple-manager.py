@@ -1,8 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from optparse import OptionParser
+from simple_manager import __version__ as Version
+
 import sys
-import getopt
 import subprocess
 import yaml
 import os
@@ -24,12 +26,12 @@ def git_clone():
 
 def git_update():
     cmd = ['git', 'pull']
-    p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+project)
+    p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
     p.wait()
     
 def git_push():
     cmd = ['git', 'push']
-    p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+project)
+    p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
     p.wait()
 
 def main(argv):
@@ -38,50 +40,89 @@ def main(argv):
     global WORKSPACE
     global project
 
-    try:
-        opts, args = getopt.getopt(argv,"hy:r:ucpTt:",["update=","create=","push=","tags=","yaml="])
-    except getopt.GetoptError:
-        print 'Usage: python simple-manager -y <yaml file> -c <project> -[cptu]'
+    parser = OptionParser(version=Version)
+    parser.add_option("-c", "--clone", action="store_true", dest="clone",
+                      help="Clone a project")
+
+    parser.add_option("-f", "--file", dest="filename", help="Path do config.yaml",
+                      metavar="FILE")
+
+    parser.add_option("-p", "--push", action="store_true", dest="push",
+                      help="Push changes to remote repository")
+
+    parser.add_option("-u", "--update", action="store_true", dest="update", help="Update repositories.")
+
+    parser.add_option("-T", "--TAGS", action="store_true", dest="tags",
+                      help="Show last tags por all configured repositories")
+
+    parser.add_option("-t", "--tag", dest="tag",
+                      help="Tag a repo or all repos, if none tag is provided")
+
+    parser.add_option("-r", "--repo", dest="project", metavar="(PROJECT|all)",
+                      help="The project as configured in config.yaml")
+
+    (options, args) = parser.parse_args()
+
+    if not options.filename:
+        print 'You must provide a config.yaml file.'
         sys.exit(2)
-
-    for opt, arg in opts:
-        if opt == '-h':
-            print 'python simple-manager -y <yaml file> -c <project> -[cptu]'
-            sys.exit()
-
-        elif opt in ("-y", "--yaml"):
-            yaml_file = arg
-            config = yaml.load(open(yaml_file, 'r'))
-            WORKSPACE = config['workspace']
-
-        elif opt in ("-r", "--repo"):
-            project = arg
-
-            if not config['projects'].get(project):
-                print "Project '%s' is not configured in config.yaml. Please, verify." % project
+    
+    yaml_file = options.filename
+    config = yaml.load(open(yaml_file, 'r'))
+    WORKSPACE = config['workspace']
+    
+    if options.project:
+        project = options.project
+        if not config['projects'].get(options.project):
+            print "Project '%s' is not configured in config.yaml. Please, verify." % project
             sys.exit(2)
+    else:
+        project = "all"
 
-        elif opt in ("-u", "--update"):
+    if options.update:
+        if project != 'all':
             git_update()
+        else:
+            print "Updating %s"  % ', '.join(config['projects'].keys())
+            for repo in config['projects'].keys():
+                project = repo
+                git_update()
 
-        elif opt in ("-c", "--create"):
+    elif options.clone:
+        if project != 'all':
             git_clone()
-            #thread?
+        else:
+            print "Cloning %s"  % ', '.join(config['projects'].keys())
+            for repo in config['projects'].keys():
+                project = repo
+                git_clone()
 
-        elif opt in ("-p", "--push"):
+    elif options.push:
+        if project != 'all':
             git_push()
+        else:
+            print "Pushing %s"  % ', '.join(config['projects'].keys())
+            for repo in config['projects'].keys():
+                project = repo
+                git_push()
 
-        elif opt in ("-T", "--tags"):
+    elif options.tags:
+        if project != 'all':
             get_last_tag()
-            
-        elif opt in ("-t", "--tag"):
-            if project == 'all':
-                print "You must specify only one project to use -t option but you specified 'all'"
-                sys.exit(2)
-            else:
-                tag = arg
+            print "Getting lasts tags for %s"  % ', '.join(config['projects'].keys())
+            for repo in config['projects'].keys():
+                project = repo
+                get_last_tag()
+
+    elif options.tag:
+        if project == 'all':
+            git_tag()
+        else:
+            print "Tagging projects %s"  % ', '.join(config['projects'].keys())
+            #print "User you be promped to enter each desired tag"
+            for repo in config['projects'].keys():
                 git_tag()
-            
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

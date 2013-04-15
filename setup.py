@@ -6,8 +6,8 @@ from simple_manager import __version__ as Version
 setup(
     name=u'simple-dependencies-manager',
     version=Version,
-    description=u"A simple script that helps you take control of your projects so you don't get crazy!",
-    long_description=u"A simple script that helps you take control of your projects so you don't get crazy!",
+    description=u"A simple script that helps you take control of your projects so you do not get crazy!",
+    long_description=u"A simple script that helps you take control of your projects so you do not get crazy!",
     keywords='dependencies manager git tags requirements',
     author=u'Victor Pantoja',
     author_email='victor.pantoja@gmail.com',

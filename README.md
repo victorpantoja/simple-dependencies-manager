@@ -22,7 +22,7 @@ CHANGE LOG
 ### 0.2.0: Managing tags
 You can easily tag all your projects in only one command:
 
-python simple-manager.py -f config.yaml -r YOUR_PROJECT_ -t
+	python simple-manager.py -f config.yaml -r YOUR_PROJECT_ -t
 
 User will be shown de last project's tag and will be promped to enter a new one and also a description.
 

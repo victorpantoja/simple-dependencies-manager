@@ -47,6 +47,9 @@ def git_push():
     p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
     p.wait()
 
+def git_push_tag():
+    pass
+
 def git_tag():
     git_update()
     tag = get_last_tag()
@@ -59,7 +62,8 @@ def git_tag():
 
     subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
     
-    
+    git_push()
+    git_push_tag()
 
 def main(argv):
     global config
@@ -82,7 +86,7 @@ def main(argv):
     parser.add_option("-T", "--TAGS", action="store_true", dest="tags",
                       help="Show last tags por all configured repositories")
 
-    parser.add_option("-t", "--tag", dest="tag",
+    parser.add_option("-t", "--tag", action="store_true", dest="tag",
                       help="Tag a repo or all repos, if none tag is provided")
 
     parser.add_option("-r", "--repo", dest="project", metavar="(PROJECT|all)",
@@ -150,7 +154,6 @@ def main(argv):
             git_tag()
         else:
             print "Tagging projects %s"  % ', '.join(config['projects'].keys())
-            #print "User you be promped to enter each desired tag"
             for repo in config['projects'].keys():
                 project = repo
                 git_tag()

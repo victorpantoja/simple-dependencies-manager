@@ -18,10 +18,16 @@ This way, you will pull both project from git.
 
 
 CHANGE LOG
-==========
-0.1.0: First version. Things like cloning, pushing and pulling implemented
+----------
+### 0.2.0: Managing tags
+You can easily tag all your projects in only one command:
+
+python simple-manager.py -f config.yaml -r YOUR_PROJECT_ -t
+
+User will be shown de last project's tag and will be promped to enter a new one and also a description.
+
+### 0.1.0: First version. Things like cloning, pushing and pulling implemented
 
 RELEASE PLAN
-============
-0.2.0: Managing tags
-0.3.0: Install dependencies
+------------
+### 0.3.0: Install dependencies

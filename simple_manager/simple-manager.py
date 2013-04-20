@@ -20,6 +20,7 @@ def get_last_tag():
     try:
         tag = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
         print "Last tag for %s: %s" % (project, tag.replace("\n",""))
+        return tag
     except:
         print "No tags found for %s" % project
 
@@ -35,14 +36,30 @@ def develop_install():
     p.wait()
 
 def git_update():
+    print "Updating %s" % project
     cmd = ['git', 'pull']
     p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
     p.wait()
     
 def git_push():
+    print "Sending changes of %s to remote server" % project
     cmd = ['git', 'push']
     p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
     p.wait()
+
+def git_tag():
+    git_update()
+    tag = get_last_tag()
+
+    new_tag = raw_input("Enter new tag: ")
+    description = raw_input("Enter a description for this tag: ")
+
+    cmd = 'git tag -a %s -m "%s"' % (new_tag, description)
+    cwd = '%s/%s'% (WORKSPACE, config['projects'][project]['name'])
+
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
+    
+    
 
 def main(argv):
     global config

@@ -48,7 +48,9 @@ def git_push():
     p.wait()
 
 def git_push_tag():
-    pass
+    cmd = 'git push --tags'
+    cwd = '%s/%s'% (WORKSPACE, config['projects'][project]['name'])
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
 
 def git_tag():
     git_update()

@@ -12,7 +12,8 @@ Sounds crazy? Yeah...
 With simple-dependencies-manager, you can create a new version of your dependencies, pull versions to git and upload to your egg repository.
 
 As simple as:
-$ python simple-manager -f config.yaml --(pull|clone|push)
+
+	python simple-manager -f config.yaml --(pull|clone|push|tag)
 
 This way, you will pull both project from git.
 
@@ -30,4 +31,4 @@ User will be shown de last project's tag and will be promped to enter a new one 
 
 RELEASE PLAN
 ------------
-### 0.3.0: Install dependencies
+### 0.3.0: Install dependencies using python setup develop

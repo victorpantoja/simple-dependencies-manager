@@ -15,12 +15,22 @@ project = None
 
 def get_last_tag():
     cmd = 'git describe --tags `git rev-list --tags --max-count=1`'
-    p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+project)
-    p.wait()
+    cwd = '%s/%s'% (WORKSPACE, config['projects'][project]['name'])
+
+    try:
+        tag = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
+        print "Last tag for %s: %s" % (project, tag.replace("\n",""))
+    except:
+        print "No tags found for %s" % project
 
 def git_clone():
     cmd = ['git', 'clone', config['projects'][project]['repo']]
     print "Cloning %s into %s" % (project, WORKSPACE)
+    p = subprocess.Popen(cmd, cwd=WORKSPACE)
+    p.wait()
+
+def develop_install():
+    cmd = ['python', 'setup.py', 'install', config['projects'][project]['repo']]
     p = subprocess.Popen(cmd, cwd=WORKSPACE)
     p.wait()
 
@@ -60,6 +70,9 @@ def main(argv):
 
     parser.add_option("-r", "--repo", dest="project", metavar="(PROJECT|all)",
                       help="The project as configured in config.yaml")
+
+    parser.add_option("-d", "--pip-develop", action="store_true", dest="develop",
+                      help="Install dependencies in 'develop mode'")
 
     (options, args) = parser.parse_args()
 
@@ -109,20 +122,30 @@ def main(argv):
     elif options.tags:
         if project != 'all':
             get_last_tag()
-            print "Getting lasts tags for %s"  % ', '.join(config['projects'].keys())
+        else:
+            print "Getting last tags for %s"  % ', '.join(config['projects'].keys())
             for repo in config['projects'].keys():
                 project = repo
                 get_last_tag()
 
     elif options.tag:
-        if project == 'all':
+        if project != 'all':
             git_tag()
         else:
             print "Tagging projects %s"  % ', '.join(config['projects'].keys())
             #print "User you be promped to enter each desired tag"
             for repo in config['projects'].keys():
+                project = repo
                 git_tag()
 
+    elif options.develop:
+        if project != 'all':
+            develop_install()
+        else:
+            print "Installing projects %s"  % ', '.join(config['projects'].keys())
+            for repo in config['projects'].keys():
+                project = repo
+                develop_install()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

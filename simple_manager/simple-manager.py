@@ -3,6 +3,7 @@
 
 from optparse import OptionParser
 from simple_manager import __version__ as Version
+from simple_manager.utils import git_clone
 
 import sys
 import subprocess
@@ -23,12 +24,6 @@ def get_last_tag():
         return tag
     except:
         print "No tags found for %s" % project
-
-def git_clone():
-    cmd = ['git', 'clone', config['projects'][project]['repo']]
-    print "Cloning %s into %s" % (project, WORKSPACE)
-    p = subprocess.Popen(cmd, cwd=WORKSPACE)
-    p.wait()
 
 def develop_install():
     cmd = ['python', 'setup.py', 'install', config['projects'][project]['repo']]
@@ -126,12 +121,15 @@ def main(argv):
 
     elif options.clone:
         if project != 'all':
-            git_clone()
+            git_clone(project=project,
+                      url=config['projects'][project]['repo'],
+                      workspace=WORKSPACE)
         else:
             print "Cloning %s"  % ', '.join(config['projects'].keys())
             for repo in config['projects'].keys():
-                project = repo
-                git_clone()
+                git_clone(project=repo,
+                          url=config['projects'][repo]['repo'],
+                          workspace=WORKSPACE)
 
     elif options.push:
         if project != 'all':

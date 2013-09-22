@@ -3,7 +3,7 @@
 
 from optparse import OptionParser
 from simple_manager import __version__ as Version
-from simple_manager.utils import git_clone
+from simple_manager.utils import git_clone, git_push
 
 import sys
 import subprocess
@@ -35,12 +35,6 @@ def git_update():
     cmd = ['git', 'pull']
     p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
     p.wait()
-    
-def git_push():
-    print "Sending changes of %s to remote server" % project
-    cmd = ['git', 'push']
-    p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
-    p.wait()
 
 def git_push_tag():
     cmd = 'git push --tags'
@@ -59,7 +53,7 @@ def git_tag():
 
     subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
     
-    git_push()
+    git_push(WORKSPACE, config['projects'][project]['name'])
     git_push_tag()
 
 def main(argv):
@@ -133,7 +127,7 @@ def main(argv):
 
     elif options.push:
         if project != 'all':
-            git_push()
+            git_push(WORKSPACE, config['projects'][project]['name'])
         else:
             print "Pushing %s"  % ', '.join(config['projects'].keys())
             for repo in config['projects'].keys():

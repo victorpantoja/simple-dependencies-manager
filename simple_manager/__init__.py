@@ -2,5 +2,5 @@
 
 from datetime import date
 
-__version__ = "0.3.0"
-__release_date__ = date(2013, 9, 20)
+__version__ = "0.4.0"
+__release_date__ = date(2013, 9, 22)

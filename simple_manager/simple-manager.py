@@ -3,7 +3,10 @@
 
 from optparse import OptionParser
 from simple_manager import __version__ as Version
-from simple_manager.utils import git_clone, git_push
+from simple_manager.utils import git_clone
+from simple_manager.utils import git_push
+from simple_manager.utils import git_push_tag
+from simple_manager.utils import git_update
 
 import sys
 import subprocess
@@ -30,31 +33,20 @@ def develop_install():
     p = subprocess.Popen(cmd, cwd=WORKSPACE)
     p.wait()
 
-def git_update():
-    print "Updating %s" % project
-    cmd = ['git', 'pull']
-    p = subprocess.Popen(cmd, cwd=WORKSPACE+'/'+config['projects'][project]['name'])
-    p.wait()
-
-def git_push_tag():
-    cmd = 'git push --tags'
-    cwd = '%s/%s'% (WORKSPACE, config['projects'][project]['name'])
-    subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
-
-def git_tag():
-    git_update()
-    tag = get_last_tag()
-
-    new_tag = raw_input("Enter new tag: ")
-    description = raw_input("Enter a description for this tag: ")
-
-    cmd = 'git tag -a %s -m "%s"' % (new_tag, description)
-    cwd = '%s/%s'% (WORKSPACE, config['projects'][project]['name'])
-
-    subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
-    
-    git_push(WORKSPACE, config['projects'][project]['name'])
-    git_push_tag()
+# def git_tag():
+#     git_update(WORKSPACE, config['projects'][project]['name'])
+#     tag = get_last_tag()
+# 
+#     new_tag = raw_input("Enter new tag: ")
+#     description = raw_input("Enter a description for this tag: ")
+# 
+#     cmd = 'git tag -a %s -m "%s"' % (new_tag, description)
+#     cwd = '%s/%s'% (WORKSPACE, config['projects'][project]['name'])
+# 
+#     subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
+#     
+#     git_push(WORKSPACE, config['projects'][project]['name'])
+#     git_push_tag(WORKSPACE, config['projects'][project]['name'])
 
 def main(argv):
     global config

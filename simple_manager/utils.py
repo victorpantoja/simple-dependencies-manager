@@ -60,3 +60,22 @@ def git_update(workspace, project):
     cmd = ['git', 'pull']
     p = subprocess.Popen(cmd, cwd=workspace + '/' + project)
     p.wait()
+
+
+def git_status(workspace, project):
+    print "Verifying status for %s" % project
+    cmd = ['git', 'status']
+    p = subprocess.Popen(cmd, cwd=workspace + '/' + project)
+    p.wait()
+
+
+def get_last_tag(workspace, project):
+    cmd = 'git describe --tags `git rev-list --tags --max-count=1`'
+    cwd = '%s/%s' % (workspace, project)
+
+    try:
+        tag = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
+        print "Last tag for %s: %s" % (project, tag.replace("\n", ""))
+        return tag
+    except:
+        print "No tags found for %s" % project

@@ -7,6 +7,8 @@ from simple_manager.utils import git_clone
 from simple_manager.utils import git_push
 from simple_manager.utils import git_push_tag
 from simple_manager.utils import git_update
+from simple_manager.utils import git_status
+from simple_manager.utils import get_last_tag
 
 import sys
 import subprocess
@@ -16,17 +18,6 @@ import os
 config = None
 WORKSPACE = None
 project = None
-
-def get_last_tag():
-    cmd = 'git describe --tags `git rev-list --tags --max-count=1`'
-    cwd = '%s/%s'% (WORKSPACE, config['projects'][project]['name'])
-
-    try:
-        tag = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, cwd=cwd).stdout.read()
-        print "Last tag for %s: %s" % (project, tag.replace("\n",""))
-        return tag
-    except:
-        print "No tags found for %s" % project
 
 def develop_install():
     cmd = ['python', 'setup.py', 'install', config['projects'][project]['repo']]
@@ -66,6 +57,8 @@ def main(argv):
 
     parser.add_option("-u", "--update", action="store_true", dest="update", help="Update repositories.")
 
+    parser.add_option("-s", "--status", action="store_true", dest="status", help="See repositories statuses.")
+
     parser.add_option("-T", "--TAGS", action="store_true", dest="tags",
                       help="Show last tags por all configured repositories")
 
@@ -98,14 +91,21 @@ def main(argv):
 
     if options.update:
         if project != 'all':
-            git_update()
+            git_update(WORKSPACE, project)
         else:
-            print "Updating %s"  % ', '.join(config['projects'].keys())
             for repo in config['projects'].keys():
                 project = repo
-                git_update()
+                git_update(WORKSPACE, project)
 
-    elif options.clone:
+    if options.status:
+        if project != 'all':
+            git_status(WORKSPACE, project)
+        else:
+            for repo in config['projects'].keys():
+                project = repo
+                git_status(WORKSPACE, project)
+
+    if options.clone:
         if project != 'all':
             git_clone(project=project,
                       url=config['projects'][project]['repo'],
@@ -128,12 +128,12 @@ def main(argv):
 
     elif options.tags:
         if project != 'all':
-            get_last_tag()
+            get_last_tag(WORKSPACE, project)
         else:
             print "Getting last tags for %s"  % ', '.join(config['projects'].keys())
             for repo in config['projects'].keys():
                 project = repo
-                get_last_tag()
+                get_last_tag(WORKSPACE, project)
 
     elif options.tag:
         if project != 'all':

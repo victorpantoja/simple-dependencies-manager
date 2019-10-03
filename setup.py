@@ -22,6 +22,6 @@ setup(
     scripts=['simple_manager/simple-manager.py'],
 
     install_requires=[
-        "PyYAML==3.10"
+        "PyYAML==5.1"
     ]
 )
